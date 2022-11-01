@@ -1,123 +1,94 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
-import { SongCard } from "../components";
 
-const endingSongs = [
-  {
-    rank: 1,
-    songJpName: "残機",
-    songEnName: "Zanki",
-    artistJpName: "ずっと真夜中でいいのに",
-    artistEnName: "ZUTOMAYO",
-    imageSrc: "1.jpeg",
-    actualEpisodeNumber: 2,
-    numberOfVotes: 1024,
-  },
-  {
-    rank: 2,
-    songJpName: "CHAINSAW BLOOD",
-    songEnName: "",
-    artistJpName: "バウンディ",
-    artistEnName: "Vaundy",
-    imageSrc: "2.jpeg",
-    actualEpisodeNumber: 1,
-    numberOfVotes: 512,
-  },
-  {
-    rank: 3,
-    songJpName: "刃渡り2億センチ",
-    songEnName: "Hawatari 2-Oku Centi",
-    artistJpName: "マキシマム ザ ホルモン",
-    artistEnName: "Maximum The Hormone",
-    imageSrc: "3.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 4,
-    songJpName: "ちゅ、多様性",
-    songEnName: "Chu, Tayousei",
-    artistJpName: "あの",
-    artistEnName: "ano",
-    imageSrc: "4.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 5,
-    songJpName: "Deep down",
-    songEnName: "",
-    artistJpName: "エメ",
-    artistEnName: "Aimer",
-    imageSrc: "5.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 6,
-    songJpName: "大脳的なランデブー",
-    songEnName: "Dainоteki na Rendezvous",
-    artistJpName: "Kanaria",
-    artistEnName: "カナリア",
-    imageSrc: "6.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 7,
-    songJpName: "インザバックルーム",
-    songEnName: "In the Back Room",
-    artistJpName: "手動",
-    artistEnName: "syudou",
-    imageSrc: "7.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 8,
-    songJpName: "ファイトソング",
-    songEnName: "Fight Song",
-    artistJpName: "いぶ",
-    artistEnName: "Eve",
-    imageSrc: "8.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 9,
-    songJpName: "バイオレンス",
-    songEnName: "Violence",
-    artistJpName: "女王蜂",
-    artistEnName: "Queen Bee",
-    imageSrc: "9.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 10,
-    songJpName: "first death",
-    songEnName: "",
-    artistJpName: "TK from 凛として時雨",
-    artistEnName: "TK from ling tosite sigure",
-    imageSrc: "10.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 11,
-    songJpName: "錠剤",
-    songEnName: "Jоzai",
-    artistJpName: "TOOBOE スタッフ",
-    artistEnName: "",
-    imageSrc: "11.jpeg",
-    numberOfVotes: 0,
-  },
-  {
-    rank: 12,
-    songJpName: "DOGLAND",
-    songEnName: "",
-    artistJpName: "PEOPLE 1",
-    artistEnName: "ピープルワン",
-    imageSrc: "12.jpeg",
-    numberOfVotes: 0,
-  },
-];
+import { useCallback, useMemo, useState, useEffect } from "react";
+import { useQueryClient } from "react-query";
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
-const Home: NextPage = () => {
-  const [isVoted, setIsVoted] = useState(false);
+import { OptionSongCard, ResultCard, SongDetail } from "../components";
+import { fetchCurrentEpisode, useCurrentEpisodeQuery } from "../hooks/useCurrentEpisodeQuery";
+import { fetchHasVoted, useHasVotedQuery } from "../hooks/useHasVotedQuery";
+import { fetchEpisodeVotes, useEpisodeVotesQuery } from "../hooks/useEpisodeVotesQuery";
+import { useVoteMutation } from "../hooks/useVoteMutation";
+
+import { CurrentEpisode, EpisodeVote, HasVoted, Song } from "../types/model";
+import { AnimatePresence, AnimateSharedLayout } from 'framer-motion';
+
+export const getServerSideProps = async () => {
+  const currentEpisode = await fetchCurrentEpisode();
+  const hasVoted = await fetchHasVoted(currentEpisode.id);
+
+  let episodeVotes: EpisodeVote[] = [];
+  if (hasVoted.hasVoted) {
+    episodeVotes = await fetchEpisodeVotes(currentEpisode.id);
+  }
+
+  return {
+    props: {
+      currentEpisode,
+      hasVoted,
+      episodeVotes,
+    }
+  }
+}
+
+type Props = {
+  currentEpisode: CurrentEpisode;
+  hasVoted: HasVoted;
+  episodeVotes: EpisodeVote[];
+};
+
+const Home: NextPage<Props> = (props) => {
+  const queryClient = useQueryClient();
+
+  const { data: currentEpisode } = useCurrentEpisodeQuery({ initialData: props.currentEpisode })
+  const { data: hasVoted } = useHasVotedQuery({ initialData: props.hasVoted, episodeId: props.currentEpisode.id })
+  const { data: episodeVotes } = useEpisodeVotesQuery({ initialData: props.episodeVotes, episodeId: props.currentEpisode.id });
+
+  const { lastMessage, readyState } = useWebSocket(`${process.env.NEXT_PUBLIC_BASE_WS_URL}/${props.currentEpisode.id}`);
+
+  const voteMutation = useVoteMutation(queryClient);
+
+  const [selectedSong, setSelectedSong] = useState<Song>(props.currentEpisode.songs[0])
+
+  const votedSong = useMemo(() => {
+    if (hasVoted === undefined || currentEpisode === undefined) return null;
+    if (hasVoted.hasVoted === false) return null
+
+    return currentEpisode.songs.find((s) => s.episodeSongId === hasVoted.episodeSongId);
+  }, [currentEpisode, hasVoted]);
+
+  const songMap: Record<string, Song> = useMemo(() => {
+    let map: Record<string, Song> = {}
+    if (currentEpisode?.songs) {
+      map = currentEpisode.songs.reduce<Record<string, Song>>((acc, cur) => ({
+        ...acc,
+        [cur.episodeSongId]: cur,
+      }), map)
+    }
+    return map
+  }, [currentEpisode]);
+
+  const sortedVotes = useMemo(() => {
+    if (episodeVotes) {
+      return episodeVotes.sort((a, b) => a.rank - b.rank)
+    }
+    return []
+  }, [episodeVotes])
+
+  const handleVote = useCallback(() => {
+    voteMutation.mutate({
+      episodeSongId: selectedSong.episodeSongId,
+    });
+  }, [voteMutation, selectedSong]);
+
+  useEffect(() => {
+    if (lastMessage === null) return;
+    const data = JSON.parse(lastMessage.data);
+    if (data.message) {
+      queryClient.setQueryData('episodeVotes', data.message);
+    }
+  }, [queryClient, lastMessage])
 
   return (
     <div>
@@ -127,29 +98,81 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="bg-black h-max-screen text-white flex flex-col items-center pt-8">
-        <h1 className="text-4xl mb-8">
-          Vote for Episode <span>3</span>
-        </h1>
+      <main className="bg-gray-800 h-max-screen min-h-screen">
+        {currentEpisode && hasVoted && hasVoted?.hasVoted && (
+          <>
+            <div className="sticky p-4 text-bold w-full bg-gray-800 text-center top-0 z-10 md:p-8">
+              <div className="text-white font-bold md:text-3xl">
+                Episode {currentEpisode.episode} Vote Result
+              </div>
+            </div>
+            <div className="p-2 md:p-16">
+            <AnimateSharedLayout>
+              <AnimatePresence>
+                {sortedVotes.map((vote) => (
+                  <ResultCard
+                    key={vote.episodeSongId}
+                    rank={vote.rank}
+                    songNameJp={songMap[vote.episodeSongId].songNameJp}
+                    songNameEn={songMap[vote.episodeSongId].songNameEn}
+                    artistNameJp={songMap[vote.episodeSongId].artistNameJp}
+                    artistNameEn={songMap[vote.episodeSongId].artistNameEn}
+                    votes={vote.numOfVotes}
+                    className="mb-4"
+                  />
+                ))}
+              </AnimatePresence>
+            </AnimateSharedLayout>
+              
+            </div>
+          </>
+        )}
+        {currentEpisode && hasVoted && hasVoted.hasVoted && (
+          <>
+            <div className="sticky p-4 text-bold w-full bg-gray-800 text-center top-0 z-10 md:p-8">
+              <div className="text-white font-bold md:text-3xl">
+                Vote ED Theme Song for Episode {currentEpisode.episode}
+              </div>
+            </div>
+            <div className="relative text-white flex flex-col p-2 md:flex-row md:p-16">
+              <div className="grid grid-cols-2 order-last gap-4 pb-12 md:order-none md:grid-cols-1 md:pb-0 md:mr-40">
+                {currentEpisode.songs.map((song) => (
+                  <OptionSongCard
+                    key={song.id}
+                    className=""
+                    artistNameJp={song.artistNameJp}
+                    selected={song.id === selectedSong.id}
+                    onSelect={() => setSelectedSong(song)}
+                  />
+                ))}
+              </div>
+              <div className="mb-4 md:mb-0 md:mt-4">
+                <SongDetail
+                  songNameEn={selectedSong.songNameEn}
+                  songNameJp={selectedSong.songNameJp}
+                  artistNameEn={selectedSong.artistNameEn}
+                  artistNameJp={selectedSong.artistNameJp}
+                  imageSrc={selectedSong.coverImageUrl}
+                  onClick={() => {}}
+                />
+                <div className="flex items-center justify-center mt-4 flex-col">
+                  {votedSong ? (
+                    <div className="ml-2 mb-4">
+                      You voted on {votedSong.songNameJp} by {votedSong.artistNameEn}
+                    </div>
+                  ) : null}
 
-        <div className="w-10/12 md:w-8/12 lg:w-6/12">
-          {endingSongs.map((song, index) => (
-            <SongCard
-              key={index}
-              className="mb-4"
-              rank={song.rank}
-              songJpName={song.songJpName}
-              songEnName={song.songEnName}
-              artistJpName={song.artistJpName}
-              artistEnName={song.artistEnName}
-              imageSrc={song.imageSrc}
-              actualEpisodeNumber={song.actualEpisodeNumber}
-              numberOfVotes={song.numberOfVotes}
-              isVoted={isVoted}
-              onVote={() => setIsVoted(true)}
-            />
-          ))}
-        </div>
+                  <button
+                    className="rounded-xl bg-slate-200 w-fit text-black py-2 px-4 mb-1"
+                    onClick={handleVote}
+                  >
+                    Vote
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

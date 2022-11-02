@@ -12,6 +12,7 @@ export type CurrentEpisode = {
 export type Song = {
   id: number
   episodeSongId: number
+  releasedAtEpisodeId: Maybe<number>
   songNameJp: string
   songNameEn: string
   artistNameJp: string

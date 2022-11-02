@@ -6,7 +6,6 @@ type Props = {
   artistNameJp: string;
   artistNameEn: string;
   imageSrc: string;
-  onClick: () => void;
   className?: string;
 };
 
@@ -17,14 +16,12 @@ const SongDetail = (props: Props) => {
     songNameJp,
     songNameEn,
     imageSrc,
-    onClick,
     className = "",
   } = props;
 
   return (
     <div
-      onClick={onClick}
-      className={clsx("rounded-xl w-full flex flex-col  items-center h-96 justify-between pb-2 bg-gray-700 shadow-md", className)}
+      className={clsx("rounded-xl w-full flex flex-col  h-96 max-w-96 justify-between pb-2 bg-gray-700 shadow-md lg:h-5/6 lg:max-w-none", className)}
     >
       <div className="relative w-full h-full">
         <div className="absolute top-0 rounded-t-xl flex w-full h-full bg-gradient-to-t from-gray-700 z-20" />
@@ -35,12 +32,12 @@ const SongDetail = (props: Props) => {
           }}
         />
       </div>
-      <div className="pt-2">
-        <h2 className="text-sm md:text-xl">
+      <div className="pt-2 pl-2 text-center lg:pl-8 lg:text-left">
+        <h2 className="text-sm md:text-xl lg:text-4xl">
           {songNameEn} {' '}
           [{songNameJp}]
         </h2>
-        <h2 className="text-sm md:text-xl">
+        <h2 className="text-sm md:text-xl lg:text-3xl lg:py-2">
           {artistNameEn} {' '}
           [{artistNameJp}]
         </h2>

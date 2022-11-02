@@ -1,11 +1,22 @@
 export type Maybe<T> = T | null
 
+export type Episode = {
+  id: number
+  episode: number
+  episodeName: Maybe<string> 
+  episodeDate: string
+  isCurrent: boolean
+  thumbnailUrl: string | null
+  releasedSong: Song | null
+}
+
 export type CurrentEpisode = {
   id: number
   episode: number
   episodeName: Maybe<string> 
   episodeDate: string
   isCurrent: boolean
+  thumbnailUrl: string | null
   songs: Song[]
 }
 

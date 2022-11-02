@@ -31,7 +31,7 @@ const ResultCard = (props: Props) => {
 
   return (
     <motion.button
-      layout={true}
+      layout
       initial="out"
       animate={isPresent ? "in" : "out"}
       variants={{

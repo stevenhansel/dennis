@@ -30,7 +30,7 @@ const CurrentEpisodeResult = (props: Props) => {
       exit={animation.exit}
       className='flex flex-col w-full h-full'
     >
-      <div className="sticky p-4 text-bold w-full bg-gray-800 text-center top-0 z-10 md:p-8">
+      <div className="p-4 text-bold w-full bg-gray-800 text-center md:p-8">
         <div className="text-white font-bold md:text-3xl">
           Episode {currentEpisode.episode} Vote Result
         </div>
@@ -52,7 +52,6 @@ const CurrentEpisodeResult = (props: Props) => {
           ))}
         </AnimatePresence>
       </AnimateSharedLayout>
-        
       </div>
     </motion.div>
   )

@@ -1,19 +1,23 @@
 import '../styles/globals.css'
 import { useState } from 'react'
 import type { AppProps } from 'next/app'
-import { QueryClientProvider, QueryClient, Hydrate } from 'react-query'
+import { QueryClientProvider, QueryClient } from 'react-query'
 
-type Props = {
-  dehydratedState: any
+import { NextPageWithLayout } from '../types/component'
+
+type Props = {}
+type ComponentProps = {
+  Component: NextPageWithLayout
 }
 
-function MyApp({ Component, pageProps }: AppProps<Props>) {
+function MyApp({ Component, pageProps }: AppProps<Props> & ComponentProps) {
   const [queryClient] = useState(() => new QueryClient());
+
+  const getLayout = Component.getLayout ?? ((page) => page)
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <Component {...pageProps} />
-      </Hydrate>
+      {getLayout(<Component {...pageProps} />)}
     </QueryClientProvider>
   )
 }

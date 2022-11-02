@@ -16,16 +16,16 @@ const OptionSongCard = (props: Props) => {
   } = props;
 
   return (
-    <div
+    <button
       onClick={onSelect}
-      className={clsx("rounded-xl items-center justify-between p-2 bg-gray-700 shadow-md hover:animate-bounce hover:bg-red-500", className, {
-        "bg-red-500": selected
+      className={clsx("cursor-pointer rounded-xl items-center justify-between p-2 bg-gray-700 shadow-md hover:animate-bounce hover:bg-pochita-orange", className, {
+        "bg-pochita-orange": selected
       })}
     >
       <h2 className="text-sm md:text-xl">
         {artistNameJp}
       </h2>
-    </div>
+    </button>
   );
 };
 

@@ -1,5 +1,5 @@
-import type { NextPage } from "next";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 
 import { useMemo, useEffect } from "react";
 import { useQueryClient } from "react-query";
@@ -10,8 +10,12 @@ import { fetchCurrentEpisode, useCurrentEpisodeQuery } from "../hooks/useCurrent
 import { fetchHasVoted, useHasVotedQuery } from "../hooks/useHasVotedQuery";
 import { fetchEpisodeVotes, useEpisodeVotesQuery } from "../hooks/useEpisodeVotesQuery";
 
+import { CurrentEpisodeResult, CurrentEpisodeVote, Layout } from '../components/organisms';
+
 import { CurrentEpisode, EpisodeVote, HasVoted, Song } from "../types/model";
-import { CurrentEpisodeResult, CurrentEpisodeVote } from '../components/organisms';
+import { NextPageWithLayout } from '../types/component';
+
+const Countdown = dynamic(() => import('../components/molecules/Countdown'), { ssr: false });
 
 export const getServerSideProps = async () => {
   const currentEpisode = await fetchCurrentEpisode();
@@ -37,7 +41,7 @@ type Props = {
   episodeVotes: EpisodeVote[];
 };
 
-const Home: NextPage<Props> = (props) => {
+const Home: NextPageWithLayout<Props> = (props) => {
   const queryClient = useQueryClient();
 
   const { data: currentEpisode } = useCurrentEpisodeQuery({ initialData: props.currentEpisode })
@@ -45,6 +49,7 @@ const Home: NextPage<Props> = (props) => {
   const { data: episodeVotes } = useEpisodeVotesQuery({ initialData: props.episodeVotes, episodeId: props.currentEpisode.id });
 
   const { lastMessage } = useWebSocket(`${process.env.NEXT_PUBLIC_BASE_WS_URL}/${props.currentEpisode.id}`);
+
 
   const songMap: Record<string, Song> = useMemo(() => {
     let map: Record<string, Song> = {}
@@ -73,32 +78,40 @@ const Home: NextPage<Props> = (props) => {
   }, [queryClient, lastMessage])
 
   return (
-    <div>
+    <>
       <Head>
         <title>CSM Ending Song Predictions</title>
         <meta name="description" content="Predict Chainsaw Man's Ending Song" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main className="bg-gray-800 h-max-screen min-h-screen">
-        <AnimatePresence>
-          {currentEpisode && hasVoted && hasVoted.hasVoted && (
-            <CurrentEpisodeResult
-              currentEpisode={currentEpisode}
-              sortedVotes={sortedVotes}
-              songMap={songMap}
-            />
-          )}
-          {currentEpisode && hasVoted && !hasVoted.hasVoted && (
-            <CurrentEpisodeVote
-              currentEpisode={currentEpisode}
-              hasVoted={hasVoted}
-            />
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
+      <AnimatePresence>
+        <Countdown date={new Date(props.currentEpisode.episodeDate)} />
+        {currentEpisode && hasVoted && hasVoted.hasVoted && (
+          <CurrentEpisodeResult
+            key="result"
+            currentEpisode={currentEpisode}
+            sortedVotes={sortedVotes}
+            songMap={songMap}
+          />
+        )}
+        {currentEpisode && hasVoted && !hasVoted.hasVoted && (
+          <CurrentEpisodeVote
+            key="vote"
+            currentEpisode={currentEpisode}
+            hasVoted={hasVoted}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
+
+Home.getLayout = (page: React.ReactNode) => {
+  return (
+    <Layout>
+      {page}
+    </Layout>
+  )
+}
 
 export default Home;

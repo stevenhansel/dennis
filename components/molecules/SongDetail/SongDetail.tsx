@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import clsx from "clsx";
 
 type Props = {
@@ -19,9 +20,14 @@ const SongDetail = (props: Props) => {
     className = "",
   } = props;
 
+  const [isEn, setIsEn] = useState(false);
+  const songName = isEn && songNameEn ? songNameEn : songNameJp;
+  const artistName = isEn && artistNameEn ? artistNameEn : artistNameJp;
+
   return (
-    <div
-      className={clsx("rounded-xl w-full flex flex-col  h-96 max-w-96 justify-between pb-2 bg-gray-700 shadow-md lg:h-5/6 lg:max-w-none", className)}
+    <button
+      onClick={() => setIsEn(!isEn)}
+      className={clsx("cursor-pointer rounded-xl w-full flex flex-col h-96 max-w-96 justify-between pb-2 bg-gray-700 shadow-md md:w-1/2 lg:h-full lg:max-w-none", className)}
     >
       <div className="relative w-full h-full">
         <div className="absolute top-0 rounded-t-xl flex w-full h-full bg-gradient-to-t from-gray-700 z-20" />
@@ -32,17 +38,15 @@ const SongDetail = (props: Props) => {
           }}
         />
       </div>
-      <div className="pt-2 pl-2 text-center lg:pl-8 lg:text-left">
+      <div className="pt-2 pl-2 text-left lg:pl-8">
         <h2 className="text-sm md:text-xl lg:text-4xl">
-          {songNameEn} {' '}
-          [{songNameJp}]
+          {songName}
         </h2>
         <h2 className="text-sm md:text-xl lg:text-3xl lg:py-2">
-          {artistNameEn} {' '}
-          [{artistNameJp}]
+          {artistName}
         </h2>
       </div>
-    </div>
+    </button>
   );
 };
 

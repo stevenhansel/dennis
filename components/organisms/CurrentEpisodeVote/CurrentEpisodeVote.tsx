@@ -50,7 +50,7 @@ const CurrentEpisodeVote = (props: Props) => {
       exit={animation.exit}
       className='flex flex-col w-full h-full'
     >
-      <div className="sticky p-4 text-bold w-full bg-gray-800 text-center top-0 z-10 md:p-8">
+      <div className="p-4 text-bold w-full bg-gray-800 text-center md:px-8">
         <div className="text-white font-bold md:text-3xl">
           Vote ED Theme Song for Episode {currentEpisode.episode}
         </div>
@@ -67,7 +67,7 @@ const CurrentEpisodeVote = (props: Props) => {
             />
           ))}
         </div>
-        <div className="flex flex-col w-full mb-4 md:mb-0 md:mt-4">
+        <div className="flex flex-col items-center w-full mb-4 md:mb-0 md:mt-4">
           <SongDetail
             songNameEn={selectedSong.songNameEn}
             songNameJp={selectedSong.songNameJp}

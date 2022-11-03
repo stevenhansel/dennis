@@ -1,25 +1,25 @@
-import Head from 'next/head';
-import { Layout } from '../components/organisms';
-import { NextPageWithLayout } from '../types/component';
-import { fetchEpisodes, useEpisodesQuery } from '../hooks/useEpisodesQuery';
-import type { Episode } from '../types/model'
-import { EpisodeCard } from '../components/molecules';
+import Head from "next/head";
+import { Layout } from "../components/organisms";
+import { NextPageWithLayout } from "../types/component";
+import { fetchEpisodes, useEpisodesQuery } from "../hooks/useEpisodesQuery";
+import type { Episode } from "../types/model";
+import { EpisodeCard } from "../components/molecules";
 
 export const getServerSideProps = async () => {
   const episodes = await fetchEpisodes();
   return {
     props: {
       episodes,
-    }
-  }
-}
+    },
+  };
+};
 
 type Props = {
-  episodes: Episode[]
-}
+  episodes: Episode[];
+};
 
 const Episodes: NextPageWithLayout<Props> = (props) => {
-  const { data: episodes } = useEpisodesQuery({ initialData: props.episodes })
+  const { data: episodes } = useEpisodesQuery({ initialData: props.episodes });
 
   return (
     <div>
@@ -28,21 +28,19 @@ const Episodes: NextPageWithLayout<Props> = (props) => {
         <meta name="description" content="Predict Chainsaw Man's Ending Song" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="grid grid-cols-1 md:px-16 md:grid-cols-3">
-        {episodes?.map((episode) => (
-          <EpisodeCard key={episode.id} episode={episode} className="mb-2" />
-        ))}
+      <main className="pt-8 flex flex-col items-center">
+        <div className="w-full px-4 md:w-4/5 max-w-[1024px]">
+          {episodes?.map((episode) => (
+            <EpisodeCard key={episode.id} episode={episode} className="mb-2 md:mb-4" />
+          ))}
+        </div>
       </main>
     </div>
-  )
+  );
 };
 
 Episodes.getLayout = (page: React.ReactNode) => {
-  return (
-    <Layout>
-      {page}
-    </Layout>
-  )
-}
+  return <Layout>{page}</Layout>;
+};
 
 export default Episodes;

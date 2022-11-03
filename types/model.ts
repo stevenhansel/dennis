@@ -41,3 +41,7 @@ export type HasVoted = {
   hasVoted: boolean;
   episodeSongId: number | null
 }
+
+export type NumOfSubscribers = {
+  numOfSubscribers: number;
+};

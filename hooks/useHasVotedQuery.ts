@@ -1,4 +1,4 @@
-import { useQuery, InitialDataFunction } from 'react-query'
+import { useQuery } from 'react-query'
 
 import type { HasVoted } from '../types/model'
 import request from '../utils/request'

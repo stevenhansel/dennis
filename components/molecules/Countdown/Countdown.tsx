@@ -8,7 +8,7 @@ const Countdown = (props: Props) => {
   const remainingTime = useCountdown(new Date(props.date));
 
   return (
-    <div key="toaster" className="text-white text-center pt-4">
+    <div key="toaster" className="text-white text-center">
       {remainingTime} before voting ends
     </div>
   )

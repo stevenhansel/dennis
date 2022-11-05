@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import Image from "next/image";
+import Link from "next/link";
 import type { Episode } from "../../../types/model";
 
 type Props = {
@@ -13,7 +14,7 @@ const EpisodeCard = (props: Props) => {
 
   return (
     <div
-      className={clsx("flex w-full", className)}
+      className={clsx("flex w-full shadow-md", className)}
       onClick={() => {
         if (onClick) {
           onClick();
@@ -47,16 +48,18 @@ const EpisodeCard = (props: Props) => {
 
       <div className="h-[111px] md:h-[201px] text-white font-light bg-slate-700/[.4] w-full">
         <div className="mt-1 ml-3 sm:ml-5">
-          <div className="flex items-center">
-            <h1 className="mt-0 md:mt-2 text-sm md:text-xl font-semibold mb-1">
-              {episode.episode}.{" "}
-              {episode.episodeName ? episode.episodeName : "???"}
-            </h1>
+          <div className="cursor-pointer flex items-center hover:text-gray-400">
+            <Link href={`/episodes/${episode.id}`}>
+              <h1 className="mt-0 md:mt-2 text-sm md:text-xl font-semibold mb-1">
+                {episode.episode}.{" "}
+                {episode.episodeName ? episode.episodeName : "???"}
+              </h1>
+            </Link>
           </div>
 
-          <div className="text-xs md:text-base">
+          {/* <div className="text-xs md:text-base">
             {new Date(episode.episodeDate).toLocaleString()}
-          </div>
+          </div> */}
 
           <p className="text-xs md:text-base mt-0.5">
             {episode.numOfVotesCasted} votes casted

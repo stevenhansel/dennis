@@ -27,7 +27,7 @@ const SongDetail = (props: Props) => {
   return (
     <button
       onClick={() => setIsEn(!isEn)}
-      className={clsx("cursor-pointer rounded-xl w-full flex flex-col h-96 max-w-96 justify-between pb-2 bg-gray-700 shadow-md md:w-1/2 lg:h-full lg:max-w-none", className)}
+      className={clsx("cursor-pointer rounded-xl w-full flex flex-col h-96 max-w-96 justify-between pb-2 bg-gray-700 shadow-md lg:w-128 lg:h-128 lg:max-w-none", className)}
     >
       <div className="relative w-full h-full">
         <div className="absolute top-0 rounded-t-xl flex w-full h-full bg-gradient-to-t from-gray-700 z-20" />

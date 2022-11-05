@@ -48,15 +48,15 @@ const CurrentEpisodeVote = (props: Props) => {
       initial={animation.initial}
       animate={animation.animate}
       exit={animation.exit}
-      className='flex flex-col w-full h-full'
+      className='flex flex-col w-full h-full items-center justify-center md:max-w-256'
     >
-      <div className="p-4 text-bold w-full bg-gray-800 text-center md:px-8">
+      <div className="p-4 text-bold w-full bg-gray-800 text-center">
         <div className="text-white font-bold md:text-3xl">
           Vote ED Theme Song for Episode {currentEpisode.episode}
         </div>
       </div>
-      <div className="relative text-white w-full flex flex-col p-2 md:flex-row md:p-16">
-        <div className="grid grid-cols-2 order-last gap-4 pb-12 md:order-none md:grid-cols-1 md:pb-0 md:mr-40">
+      <div className="relative text-white w-full flex flex-col p-2 md:flex-row md:p-4">
+        <div className="grid grid-cols-2 order-last gap-4 pb-12 md:order-none md:grid-cols-1 md:pb-0 md:mr-12">
           {currentEpisode.songs.filter((song) => !song.releasedAtEpisodeId).map((song) => (
             <OptionSongCard
               key={song.id}
@@ -67,7 +67,7 @@ const CurrentEpisodeVote = (props: Props) => {
             />
           ))}
         </div>
-        <div className="flex flex-col items-center w-full mb-4 md:mb-0 md:mt-4">
+        <div className="flex flex-col items-center w-full mb-4 md:mb-0">
           <SongDetail
             songNameEn={selectedSong.songNameEn}
             songNameJp={selectedSong.songNameJp}

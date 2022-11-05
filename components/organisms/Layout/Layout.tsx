@@ -9,7 +9,9 @@ const Layout = (props: Props) => {
   return (
     <>
       <Header />
-      <main className="bg-gray-800 h-max-screen min-h-screen">{children}</main>
+      <main id="main" className="flex flex-col items-center bg-gray-800 h-max-screen min-h-screen">
+        {children}
+      </main>
     </>
   )
 }

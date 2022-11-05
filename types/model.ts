@@ -19,6 +19,7 @@ export type CurrentEpisode = {
   episodeDate: string;
   isCurrent: boolean;
   thumbnailUrl: string | null;
+  numOfVotesCasted: number;
   songs: Song[];
 };
 

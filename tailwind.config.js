@@ -9,6 +9,13 @@ module.exports = {
       colors: {
         'pochita-orange': '#d97441',
       },
+      maxWidth: {
+        '256': '64rem',
+      },
+      spacing: {
+        '128': '32rem',
+        '256': '64rem',
+      }
     },
   },
   plugins: [],

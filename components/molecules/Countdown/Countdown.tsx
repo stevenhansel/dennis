@@ -1,14 +1,17 @@
+import clsx from 'clsx';
 import { useCountdown } from '../../../hooks/useCountdown';
 
 type Props = {
+    className?: string
     date: Date
 };
 
 const Countdown = (props: Props) => {
-  const remainingTime = useCountdown(new Date(props.date));
+  const { className, date } =props;
+  const remainingTime = useCountdown(date);
 
   return (
-    <div key="toaster" className="text-white text-center">
+    <div key="toaster" className={clsx("text-white text-sm md:text-base", className)}>
       {remainingTime} before voting ends
     </div>
   )

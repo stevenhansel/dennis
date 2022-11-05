@@ -5,6 +5,7 @@ import { useMemo, useEffect, useState } from "react";
 import { useQueryClient } from "react-query";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { AnimatePresence } from "framer-motion";
+import cloneDeep from 'lodash/cloneDeep';
 
 import {
   fetchCurrentEpisode,
@@ -17,7 +18,6 @@ import {
 } from "../hooks/useEpisodeVotesQuery";
 
 import {
-  CurrentEpisodeResult,
   CurrentEpisodeVote,
   Layout,
 } from "../components/organisms";
@@ -26,8 +26,8 @@ import { CurrentEpisode, EpisodeVote, HasVoted, Song } from "../types/model";
 import { NextPageWithLayout } from "../types/component";
 import { fetchNumOfSubscribers } from "../hooks/useNumOfSubscribersQuery";
 
-const InformationHeader = dynamic(
-  () => import("../components/organisms/InformationHeader"),
+const CurrentEpisodeResult = dynamic(
+  () => import("../components/organisms/CurrentEpisodeResult"),
   { ssr: false }
 );
 
@@ -103,12 +103,19 @@ const Home: NextPageWithLayout<Props> = (props) => {
     const data = JSON.parse(lastMessage.data);
     if (data.message) {
       if (data.topic === "new_vote") {
-        queryClient.setQueryData("episodeVotes", data.message);
+        if (currentEpisode) {
+          const updatedCurrentEpisode = cloneDeep(currentEpisode);
+          updatedCurrentEpisode.numOfVotesCasted = data.message.totalVotes;
+
+          queryClient.setQueryData("currentEpisode", updatedCurrentEpisode);
+        }
+
+        queryClient.setQueryData("episodeVotes", data.message.votes);
       } else if (data.topic === "new_subscriber") {
         setNumOfSubscribers(data.message.numOfSubscribers);
       }
     }
-  }, [queryClient, lastMessage]);
+  }, [queryClient, lastMessage, currentEpisode]);
 
   useEffect(() => {
     if (readyState === ReadyState.OPEN) {
@@ -121,32 +128,29 @@ const Home: NextPageWithLayout<Props> = (props) => {
   return (
     <>
       <Head>
-        <title>CSM Ending Song Predictions</title>
+        <title>Dennis | Episode {currentEpisode?.episode}</title>
         <meta name="description" content="Predict Chainsaw Man's Ending Song" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <AnimatePresence>
-        <InformationHeader
-          key="informationHeader"
-          numOfSubscribers={numOfSubscribers}
-          date={new Date(props.currentEpisode.episodeDate)}
-        />
-
-        {currentEpisode && hasVoted && hasVoted.hasVoted && (
-          <CurrentEpisodeResult
-            key="result"
-            currentEpisode={currentEpisode}
-            sortedVotes={sortedVotes}
-            songMap={songMap}
-          />
-        )}
-        {currentEpisode && hasVoted && !hasVoted.hasVoted && (
+        {currentEpisode && hasVoted ? hasVoted.hasVoted && hasVoted.episodeSongId !== null ? (
+          <div>
+            <CurrentEpisodeResult
+              key="result"
+              currentEpisode={currentEpisode}
+              sortedVotes={sortedVotes}
+              songMap={songMap}
+              numOfSubscribers={numOfSubscribers}
+              selectedEpisodeSongId={hasVoted.episodeSongId}
+            />
+          </div>
+        ) : (
           <CurrentEpisodeVote
             key="vote"
             currentEpisode={currentEpisode}
             hasVoted={hasVoted}
           />
-        )}
+        ) : null}
       </AnimatePresence>
     </>
   );

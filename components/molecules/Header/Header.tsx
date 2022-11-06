@@ -7,6 +7,7 @@ import ActiveLink from './ActiveLink'
 
 const index = "/"
 const episodes = "/episodes"
+const about = "/about"
 
 const woofSoundArr = [
   "/pochita1.mp3",
@@ -50,6 +51,11 @@ const Header = () => {
             text="episodes"
             href={episodes}
             isActive={router.asPath.includes(episodes)}
+          />
+          <ActiveLink
+            text="about"
+            href={about}
+            isActive={router.asPath === about}
           />
         </div>
       </div>

@@ -16,6 +16,7 @@ import {
   fetchEpisodeVotes,
   useEpisodeVotesQuery,
 } from "../hooks/useEpisodeVotesQuery";
+import { fetchNumOfSubscribers } from "../hooks/useNumOfSubscribersQuery";
 
 import {
   CurrentEpisodeVote,
@@ -24,7 +25,8 @@ import {
 
 import { CurrentEpisode, EpisodeVote, HasVoted, Song } from "../types/model";
 import { NextPageWithLayout } from "../types/component";
-import { fetchNumOfSubscribers } from "../hooks/useNumOfSubscribersQuery";
+
+import { newSubscriberTopic, newVoteTopic } from '../constants/topics';
 
 const CurrentEpisodeResult = dynamic(
   () => import("../components/organisms/CurrentEpisodeResult"),
@@ -102,7 +104,7 @@ const Home: NextPageWithLayout<Props> = (props) => {
 
     const data = JSON.parse(lastMessage.data);
     if (data.message) {
-      if (data.topic === "new_vote") {
+      if (data.topic === newVoteTopic) {
         if (currentEpisode) {
           const updatedCurrentEpisode = cloneDeep(currentEpisode);
           updatedCurrentEpisode.numOfVotesCasted = data.message.totalVotes;
@@ -111,7 +113,7 @@ const Home: NextPageWithLayout<Props> = (props) => {
         }
 
         queryClient.setQueryData("episodeVotes", data.message.votes);
-      } else if (data.topic === "new_subscriber") {
+      } else if (data.topic === newSubscriberTopic) {
         setNumOfSubscribers(data.message.numOfSubscribers);
       }
     }

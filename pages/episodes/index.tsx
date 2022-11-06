@@ -31,7 +31,7 @@ const Episodes: NextPageWithLayout<Props> = (props) => {
         <meta name="description" content="Predict Chainsaw Man's Ending Song" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="pt-8 flex flex-col items-center w-full px-4 md:max-w-256">
+      <div className="pt-8 flex flex-col items-center w-full px-2 md:px-4 md:max-w-256">
         {episodes?.map((episode) => (
           <EpisodeCard key={episode.id} episode={episode} className="mb-2 md:mb-4" />
         ))}

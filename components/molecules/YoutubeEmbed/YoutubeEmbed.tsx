@@ -9,17 +9,16 @@ const getYoutubeId = (youtubeUrl: string) => {
     return youtubeIdMatch[1]
   }
   return ''
-
 }
 const getYoutubeEmbed = (youtubeId: string) => `https://youtube.com/embed/${youtubeId}`
 
 const YoutubeEmbed = (props: Props) => (
   <>
     <div className="w-full md:hidden">
-      <iframe width="100%" height="300" src={getYoutubeEmbed(getYoutubeId(props.youtubeUrl))} />
+      <iframe className="rounded-md" width="100%" height="352" src={getYoutubeEmbed(getYoutubeId(props.youtubeUrl))} />
     </div>
     <div className="hidden w-full md:block">
-      <iframe width="100%" height="576" src={getYoutubeEmbed(getYoutubeId(props.youtubeUrl))} />
+      <iframe className="rounded-md" width="100%" height="576" src={getYoutubeEmbed(getYoutubeId(props.youtubeUrl))} />
     </div>
   </>
 );

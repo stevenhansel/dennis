@@ -148,14 +148,13 @@ const EpisodeDetail: NextPageWithLayout<Props> = (props) => {
             <AnimateSharedLayout>
               <AnimatePresence>
                 {sortedVotes.map((vote) => {
-                  const percentage = (vote.numOfVotes / episode.numOfVotesCasted) * 100;
-
-                  if (percentage === 0) {
+                  if (vote.numOfVotes === 0) {
                     return (
                       <Fragment key={vote.episodeSongId} />
                     )
-                  }  
+                  }
 
+                  const percentage = (vote.numOfVotes / episode.numOfVotesCasted) * 100;
                   return (
                     <ResultCard
                       key={vote.episodeSongId}

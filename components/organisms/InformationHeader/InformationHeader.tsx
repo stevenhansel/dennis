@@ -40,7 +40,7 @@ const InformationHeader = (props: Props) => {
           </div>
 
           <div className="flex flex-col mb-1 md:mb-0">
-            <p className="text-white text-xs md:text-base mb-0.5 md:mb-1">{episodeDate}</p>
+            <p className="text-white text-xs md:text-base mb-0.5 md:mb-1">{episodeDate} {new Date().toLocaleDateString(undefined, {day:'2-digit',timeZoneName: 'short' }).substring(4)}</p>
             {withCountdown ? (
               <Countdown className="mb-0.5 md:mb-1 text-xs" date={new Date(episode.episodeDate)} />
             ) : null}

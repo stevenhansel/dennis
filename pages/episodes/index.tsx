@@ -9,12 +9,20 @@ import type { NextPageWithLayout } from "../../types/component";
 import type { Episode } from "../../types/model";
 
 export const getServerSideProps = async () => {
-  const episodes = await fetchEpisodes();
-  return {
-    props: {
-      episodes,
-    },
-  };
+  try {
+    const episodes = await fetchEpisodes();
+    return {
+      props: {
+        episodes,
+      },
+    };
+  } catch (_) {
+    return {
+      props: {
+        errorCode: 500,
+      },
+    }
+  }
 };
 
 type Props = {

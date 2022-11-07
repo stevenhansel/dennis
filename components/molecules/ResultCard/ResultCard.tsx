@@ -57,7 +57,7 @@ const ResultCard = (props: Props) => {
           </div>
 
 
-          <div className="text-left text-white w-full">
+          <div className="text-left text-white w-full mr-3">
             <h2 className="text-sm md:text-xl">
               {songName}
             </h2>

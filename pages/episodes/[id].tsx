@@ -28,17 +28,23 @@ import { AnimatePresence, AnimateSharedLayout } from 'framer-motion';
 
 export const getServerSideProps = async (context: NextPageContext) => {
   const id = parseInt(context.query.id as string, 10);
-  const episode = await fetchEpisodeById(id);
-  const hasVoted = await fetchHasVoted(id);
-  const episodeVotes = await fetchEpisodeVotes(id);
 
-  return {
-    props: {
-      episodeVotes,
-      episode,
-      hasVoted,
-    },
-  };
+  try {
+    const episode = await fetchEpisodeById(id);
+    const hasVoted = await fetchHasVoted(id);
+    const episodeVotes = await fetchEpisodeVotes(id);
+    return {
+      props: {
+        episodeVotes,
+        episode,
+        hasVoted,
+      },
+    };
+  } catch (e) {
+    return {
+      notFound: true,
+    }
+  }
 };
 
 type Props = {

@@ -34,21 +34,28 @@ const CurrentEpisodeResult = dynamic(
 );
 
 export const getServerSideProps = async () => {
-  const currentEpisode = await fetchCurrentEpisode();
-  const hasVoted = await fetchHasVoted(currentEpisode.id);
+  try {
+    const currentEpisode = await fetchCurrentEpisode();
+    const hasVoted = await fetchHasVoted(currentEpisode.id);
 
-  let episodeVotes: EpisodeVote[] = [];
-  if (hasVoted.hasVoted) {
-    episodeVotes = await fetchEpisodeVotes(currentEpisode.id);
+    let episodeVotes: EpisodeVote[] = [];
+    if (hasVoted.hasVoted) {
+      episodeVotes = await fetchEpisodeVotes(currentEpisode.id);
+    }
+    return {
+      props: {
+        currentEpisode,
+        hasVoted,
+        episodeVotes,
+      },
+    };
+  } catch (e) {
+    return {
+      props: {
+        errorCode: 500,
+      },
+    };
   }
-
-  return {
-    props: {
-      currentEpisode,
-      hasVoted,
-      episodeVotes,
-    },
-  };
 };
 
 type Props = {
@@ -75,7 +82,7 @@ const Home: NextPageWithLayout<Props> = (props) => {
   const [numOfSubscribers, setNumOfSubscribers] = useState(0);
 
   const { lastMessage, readyState } = useWebSocket(
-    `${process.env.NEXT_PUBLIC_BASE_WS_URL}/${props.currentEpisode.id}`
+    `${process.env.NEXT_PUBLIC_BASE_WS_URL}/${props.currentEpisode?.id}`
   );
 
   const songMap: Record<string, Song> = useMemo(() => {

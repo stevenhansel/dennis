@@ -8,7 +8,7 @@ import { fetchEpisodes, useEpisodesQuery } from "../../hooks/useEpisodesQuery";
 import type { NextPageWithLayout } from "../../types/component";
 import type { Episode } from "../../types/model";
 
-export const getServerSideProps = async () => {
+export const getInitialProps = async () => {
   try {
     const episodes = await fetchEpisodes();
     return {
